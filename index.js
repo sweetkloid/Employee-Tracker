@@ -5,9 +5,10 @@ const fs = require('fs');
 // The input array that node will use in the terminal
 const questions = [
   {
-    type: 'input',
-    message: 'What is your projects title?',
-    name: 'title',
+    type: 'list',
+    message: 'Please select what what you would like to do.',
+    name: 'todo',
+   choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"] 
   },
   
 ];
