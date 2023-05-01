@@ -1,5 +1,7 @@
+--making sure data is added to correct database
 USE employees_db;
 
+--adding data to department
 INSERT INTO department (id, name)
 VALUES 
 (01, "Engineering"),
@@ -7,6 +9,7 @@ VALUES
 (03, "Sales"),
 (04, "Legal");
 
+--adding data to roles that corresponds with department table
 INSERT INTO roles (id, title, salary, deparment_id)
 VALUES
 (01, "Sales Lead", 100000, 03),
@@ -18,7 +21,7 @@ VALUES
 (07, "Accountant", 125000, 02),
 (08, "Lawyer", 190000, 04);
 
-
+--adding data that corresponds to role table and internal data
 INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
 VALUES
 (01, "John", "Smith", 01, null),
