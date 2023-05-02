@@ -13,13 +13,13 @@ We wanted to build a place where employeers had the ability to view their depart
 * [Questions](#questions)
 
 ## Installation
-npm i to instal mysql2, inquirer, and console.table
+npm i to install mysql2, inquirer, and console.table
 
 ## Usage
 
 A link to the webpage is provided here: [Webpage](https://github.com/sweetkloid/Employee-Tracker)
 
-![Demo Video]()
+![Demo Video]((demo/employeedemo.avi))
 
 ## Contributing
 Thanks to the instructor, TA's, and classmates for making this posible.
