@@ -175,81 +175,7 @@ function init() {
           });
         });
       });
-    } else if (answers.todo === 'View All Departments') {
-      connection.query('SELECT * FROM department', (error, results) => {
-        if (error) throw error;
-        console.table(results);
-        init();
-      });
-    }else if (answers.todo === 'View Budget of Departments') {
-        connection.query('SELECT id, name FROM department', (error, results) => {
-          if (error) throw error;
-      
-          const choices = results.map(result => ({ name: result.name, value: result.id }));
-      
-          inquirer.prompt([
-            {
-              type: 'list',
-              name: 'department',
-              message: 'Which department would you like to view the utilized budget for?',
-              choices: choices
-            },
-            {
-              type: 'confirm',
-              name: 'confirm',
-              message: 'Are you sure you want to view the utilized budget for this department?',
-              default: false
-            }
-          ]).then(departmentInfo => {
-            if (departmentInfo.confirm) {
-              const query = 'SELECT SUM(salary) AS total_budget FROM role WHERE department_id = ?';
-      
-              connection.query(query, departmentInfo.department, (error, results) => {
-                if (error) throw error;
-      
-                console.log(`The total utilized budget for the ${departmentInfo.department} department is $${results[0].total_budget}`);
-              });
-            } else {
-              console.log('Viewing of total utilized budget cancelled.');
-            }
-          });
-        });
-    } else if (answers.todo === 'Add Department') {
-      const departmentInfo = await inquirer.prompt([
-        {
-          type: 'input',
-          message: "Enter name of department.",
-          name: 'name',
-        },
-      ]);
-      //insterting new department into the database
-      const query = 'INSERT INTO department SET ?';
-      connection.query(query, departmentInfo, (error, results) => {
-        if (error) throw error;
-        console.log('New department added successfully!');
-        init();
-      });
-    } if (answers.todo === 'View Employee by Department') {
-      connection.query('SELECT name FROM department', (error, results) => {
-        if (error) throw error;
-        const choices = results.map(result => ({ name: result.name, value: result.name }));
-        inquirer.prompt([
-          {
-            type: 'list',
-            message: 'Select a department',
-            name: 'department',
-            choices: choices
-          }
-        ]).then(answer => {
-          //grabbomg the informations to return it into the database and display in a table
-          const query = `SELECT employee.id, employee.first_name, employee.last_name FROM employee INNER JOIN roles ON employee.role_id = roles.id INNER JOIN department ON roles.department_id = department.id WHERE department.name = ?`;
-          connection.query(query, answer.department, (error, results) => {
-            if (error) throw error;
-            console.table(results);
-          });
-        });
-      });
-    }
+    } 
 
     else if (answers.todo === 'View All Roles') {
       connection.query('SELECT * FROM roles', (error, results) => {
@@ -338,6 +264,81 @@ function init() {
           }
         });
       });  
+    }else if (answers.todo === 'View All Departments') {
+      connection.query('SELECT * FROM department', (error, results) => {
+        if (error) throw error;
+        console.table(results);
+        init();
+      });
+    }else if (answers.todo === 'View Budget of Departments') {
+        connection.query('SELECT id, name FROM department', (error, results) => {
+          if (error) throw error;
+      
+          const choices = results.map(result => ({ name: result.name, value: result.id }));
+      
+          inquirer.prompt([
+            {
+              type: 'list',
+              name: 'department',
+              message: 'Which department would you like to view the utilized budget for?',
+              choices: choices
+            },
+            {
+              type: 'confirm',
+              name: 'confirm',
+              message: 'Are you sure you want to view the utilized budget for this department?',
+              default: false
+            }
+          ]).then(departmentInfo => {
+            if (departmentInfo.confirm) {
+              const query = 'SELECT SUM(salary) AS total_budget FROM roles WHERE department_id = ?';
+      
+              connection.query(query, departmentInfo.department, (error, results) => {
+                if (error) throw error;
+      
+                console.log(`The total utilized budget for this department is $${results[0].total_budget}`);
+                init();
+              });
+            } else {
+              console.log('Viewing of total utilized budget cancelled.');
+            }
+          });
+        });
+    } else if (answers.todo === 'Add Department') {
+      const departmentInfo = await inquirer.prompt([
+        {
+          type: 'input',
+          message: "Enter name of department.",
+          name: 'name',
+        },
+      ]);
+      //insterting new department into the database
+      const query = 'INSERT INTO department SET ?';
+      connection.query(query, departmentInfo, (error, results) => {
+        if (error) throw error;
+        console.log('New department added successfully!');
+        init();
+      });
+    } if (answers.todo === 'View Employee by Department') {
+      connection.query('SELECT name FROM department', (error, results) => {
+        if (error) throw error;
+        const choices = results.map(result => ({ name: result.name, value: result.name }));
+        inquirer.prompt([
+          {
+            type: 'list',
+            message: 'Select a department',
+            name: 'department',
+            choices: choices
+          }
+        ]).then(answer => {
+          //grabbomg the informations to return it into the database and display in a table
+          const query = `SELECT employee.id, employee.first_name, employee.last_name FROM employee INNER JOIN roles ON employee.role_id = roles.id INNER JOIN department ON roles.department_id = department.id WHERE department.name = ?`;
+          connection.query(query, answer.department, (error, results) => {
+            if (error) throw error;
+            console.table(results);
+          });
+        });
+      });
     }else if (answers.todo === 'Delete a Department'){
       connection.query('SELECT * FROM department', (error, results) => { 
         if (error) throw error;
