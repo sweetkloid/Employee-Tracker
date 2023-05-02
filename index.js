@@ -13,7 +13,7 @@ function init() {
       type: 'list',
       message: 'Please select what what you would like to do.',
       name: 'todo',
-      choices: ["View All Employees", "Add Employee", "Delete an Employee", "Update Employee Role", "View Employees by Manager", "Update Employee by Manager", "View Employee by Department", "View All Roles", "Add Role", "Delete a Role", "View All Departments", "Add Department", "Delete a Department", "Quit"]
+      choices: ["View All Employees", "Add Employee", "Delete an Employee", "Update Employee Role", "View Employees by Manager", "Update Employee by Manager", "View Employee by Department", "View All Roles", "Add Role", "Delete a Role", "View All Departments", "View Budget of Departments", "Add Department", "Delete a Department", "Quit"]
     },
 
   ]).then(async (answers) => {
@@ -181,6 +181,39 @@ function init() {
         console.table(results);
         init();
       });
+    }else if (answers.todo === 'View Budget of Departments') {
+        connection.query('SELECT id, name FROM department', (error, results) => {
+          if (error) throw error;
+      
+          const choices = results.map(result => ({ name: result.name, value: result.id }));
+      
+          inquirer.prompt([
+            {
+              type: 'list',
+              name: 'department',
+              message: 'Which department would you like to view the utilized budget for?',
+              choices: choices
+            },
+            {
+              type: 'confirm',
+              name: 'confirm',
+              message: 'Are you sure you want to view the utilized budget for this department?',
+              default: false
+            }
+          ]).then(departmentInfo => {
+            if (departmentInfo.confirm) {
+              const query = 'SELECT SUM(salary) AS total_budget FROM role WHERE department_id = ?';
+      
+              connection.query(query, departmentInfo.department, (error, results) => {
+                if (error) throw error;
+      
+                console.log(`The total utilized budget for the ${departmentInfo.department} department is $${results[0].total_budget}`);
+              });
+            } else {
+              console.log('Viewing of total utilized budget cancelled.');
+            }
+          });
+        });
     } else if (answers.todo === 'Add Department') {
       const departmentInfo = await inquirer.prompt([
         {
