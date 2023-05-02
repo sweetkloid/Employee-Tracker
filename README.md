@@ -19,7 +19,7 @@ npm i to install mysql2, inquirer, and console.table
 
 A link to the webpage is provided here: [Webpage](https://github.com/sweetkloid/Employee-Tracker)
 
-![Demo Video]((demo/employeedemo.avi))
+![Demo Video](demo/employeedemo.avi)
 
 ## Contributing
 Thanks to the instructor, TA's, and classmates for making this posible.
