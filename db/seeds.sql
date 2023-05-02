@@ -10,7 +10,7 @@ VALUES
 (04, "Legal");
 
 --adding data to roles that corresponds with department table
-INSERT INTO roles (id, title, salary, deparment_id)
+INSERT INTO roles (id, title, salary, department_id)
 VALUES
 (01, "Sales Lead", 100000, 03),
 (02, "Lead Engineer", 150000, 01),

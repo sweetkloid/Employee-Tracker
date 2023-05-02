@@ -1,9 +1,5 @@
-client.connect();
+SELECT * FROM department;
+SELECT * FROM roles;
+SELECT * FROM employee;
 
-client.query(`SELECT * FROM ${answers.table}`, (err, res) => {
-  if (err) throw err;
 
-  console.table(res.rows);
-
-  client.end();
-});
