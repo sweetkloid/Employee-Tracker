@@ -13,7 +13,7 @@ function init() {
       type: 'list',
       message: 'Please select what what you would like to do.',
       name: 'todo',
-      choices: ["View All Employees", "Add Employee", "Delete an Employee", "Update Employee Role", "View Employees by Manager", "Update Employee by Manager", "View Employee by Department", "View All Roles", "Add Role", "View All Departments", "Add Department", "Delete a Department", "Quit"]
+      choices: ["View All Employees", "Add Employee", "Delete an Employee", "Update Employee Role", "View Employees by Manager", "Update Employee by Manager", "View Employee by Department", "View All Roles", "Add Role", "Delete a Role", "View All Departments", "Add Department", "Delete a Department", "Quit"]
     },
 
   ]).then(async (answers) => {
@@ -56,11 +56,11 @@ function init() {
     } else if (answers.todo === 'Delete an Employee'){
       connection.query('SELECT * FROM employee', (error, results) => { 
         if (error) throw error;
-        const choices = results.map(result =>({name:result.name, value:result.})); 
+        const choices = results.map(result =>({ name: `${result.first_name} ${result.last_name}`, value: result.id }));
         inquirer.prompt ([
           {
             type: 'list',
-            message: "an employee to delete.",
+            message: "Select an employee to delete.",
             name: 'employee',
             choices: choices
           },
@@ -70,20 +70,22 @@ function init() {
             name: 'confirm',
             default: false
           }
-        ]) .then(deleteInfo => {
-          if (deleteInfo.confirm){
-            const employeeId = deleteInfo.employee;
+        ]) .then(employeeInfo => {
+          if (employeeInfo.confirm){
             const query = 'DELETE FROM employee WHERE id = ?';
-            connection.query (query, employeeId, (error, results) => {
+            connection.query(query, employeeInfo.employee, (error, result) => {
               if (error) throw error;
               console.log('Employee deleted successfully!');
+              init();
             });
           } else {
             console.log('Deletion cancelled.');
+            init();
           }
         });
       });
     }
+    
     else if (answers.todo === 'Update Employee Role') {
       // Get a list of employees to choose from
       connection.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee', (error, results) => {
@@ -162,6 +164,7 @@ function init() {
           connection.query(query, (error, results) => {
             if (error) throw error;
             console.log('Employee manager updated successfully!');
+            init();
           });
         });
       });
@@ -256,7 +259,41 @@ function init() {
           });
         });
       });
-    } else if (answers.todo === 'Delete a Department'){
+    } else if (answers.todo === 'Delete a Role'){
+      connection.query('SELECT * FROM roles', (error, results) => {
+        if (error) throw error;
+        const choices = results.map(result =>({ name:result.title, value:result.id }));
+        inquirer.prompt ([
+          {
+            type: 'list',
+            message: "Select a role to delete.",
+            name: 'role',
+            choices: choices
+          },
+          {
+            type: 'confirm',
+            message: "Are you sure you want to delete this role?",
+            name: 'confirm',
+            default: false
+          }
+        ]) .then(roleInfo => {
+          if (roleInfo.confirm){
+            const roleId = roleInfo.role;
+            connection.query('UPDATE employee SET role_id = NULL WHERE role_id = ?', [roleId], (error, result) => {
+              if (error) throw error;
+              connection.query('DELETE FROM roles WHERE id = ?', [roleId], (error, result) => {
+                if (error) throw error;
+                console.log('Role deleted successfully!');
+                init();
+              });
+            });
+          } else {
+            console.log('Deletion cancelled.');
+            init();
+          }
+        });
+      });  
+    }else if (answers.todo === 'Delete a Department'){
       connection.query('SELECT * FROM department', (error, results) => { 
         if (error) throw error;
         const choices = results.map(result =>({name:result.name, value:result.id})); 
@@ -280,9 +317,11 @@ function init() {
             connection.query (query, departmentId, (error, results) => {
               if (error) throw error;
               console.log('Department deleted successfully!');
+              init();
             });
           } else {
             console.log('Deletion cancelled.');
+            init();
           }
         });
       });
