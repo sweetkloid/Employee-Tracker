@@ -301,6 +301,7 @@ function init() {
               });
             } else {
               console.log('Viewing of total utilized budget cancelled.');
+              init();
             }
           });
         });
@@ -336,6 +337,7 @@ function init() {
           connection.query(query, answer.department, (error, results) => {
             if (error) throw error;
             console.table(results);
+            init();
           });
         });
       });
