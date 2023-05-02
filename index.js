@@ -18,8 +18,10 @@ function init() {
 
   ]).then(async (answers) => {
     if (answers.todo === 'View All Employees') {
+      //grabs the results from the database
       connection.query('SELECT * FROM employee', (error, results) => {
         if (error) throw error;
+        //takes the results and displays them in a table
         console.table(results);
         init();
       });
@@ -46,6 +48,7 @@ function init() {
           name: 'manager_id',
         },
       ]);
+      //takes the updates employee info and inserts it into the database
       const query = 'INSERT INTO employee SET ?';
       connection.query(query, employeeInfo, (error, results) => {
         if (error) throw error;
@@ -56,6 +59,7 @@ function init() {
     } else if (answers.todo === 'Delete an Employee'){
       connection.query('SELECT * FROM employee', (error, results) => { 
         if (error) throw error;
+        //grabs the employees to display them in the prompt window for selections
         const choices = results.map(result =>({ name: `${result.first_name} ${result.last_name}`, value: result.id }));
         inquirer.prompt ([
           {
@@ -72,6 +76,7 @@ function init() {
           }
         ]) .then(employeeInfo => {
           if (employeeInfo.confirm){
+            //deletes the employee by id from the database after selections
             const query = 'DELETE FROM employee WHERE id = ?';
             connection.query(query, employeeInfo.employee, (error, result) => {
               if (error) throw error;
@@ -87,7 +92,7 @@ function init() {
     }
     
     else if (answers.todo === 'Update Employee Role') {
-      // Get a list of employees to choose from
+      // Gets the employees form the database and combines first and last name together by id
       connection.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee', (error, results) => {
         if (error) throw error;
 
@@ -98,7 +103,7 @@ function init() {
           message: 'Select an employee:',
           choices: results.map(result => ({ name: result.name, value: result.id }))
         }).then(employeeInfo => {
-          // Get a list of roles to choose from
+          // grabs the roles by id from database
           connection.query('SELECT id, title FROM roles', (error, results) => {
             if (error) throw error;
 
@@ -109,7 +114,7 @@ function init() {
               message: 'Select a new role:',
               choices: results.map(result => ({ name: result.title, value: result.id }))
             }).then(roleInfo => {
-              // Update the employee's role in the database
+              // Update the employee's role in the database by displaying the roles available
               const query = 'UPDATE employee SET role_id = ? WHERE id = ?';
               const values = [roleInfo.role, employeeInfo.employee];
               connection.query(query, values, (error, results) => {
@@ -122,6 +127,7 @@ function init() {
         });
       });
     } else if (answers.todo === 'View Employees by Manager') {
+      //this grabs the information of an employee by it's manager with the m. meaning manager and e meaining employee
       connection.query("SELECT DISTINCT m.id, m.first_name, m.last_name FROM employee e JOIN employee m ON e.manager_id = m.id ORDER BY m.last_name ASC", (error, results) => {
         if (error) throw error;
         const managers = results.map(result => ({ name: `${result.first_name} ${result.last_name}`, value: result.id }));
@@ -135,6 +141,7 @@ function init() {
         ])
           .then(managerChoice => {
             const managerId = managerChoice.manager;
+            //this grabs the information to dispaly it in a table based on parameters
             connection.query(`SELECT * FROM employee WHERE manager_id = ${managerId}`, (error, results) => {
               if (error) throw error;
               console.table(results);
@@ -182,6 +189,7 @@ function init() {
           name: 'name',
         },
       ]);
+      //insterting new department into the database
       const query = 'INSERT INTO department SET ?';
       connection.query(query, departmentInfo, (error, results) => {
         if (error) throw error;
@@ -200,6 +208,7 @@ function init() {
             choices: choices
           }
         ]).then(answer => {
+          //grabbomg the informations to return it into the database and display in a table
           const query = `SELECT employee.id, employee.first_name, employee.last_name FROM employee INNER JOIN roles ON employee.role_id = roles.id INNER JOIN department ON roles.department_id = department.id WHERE department.name = ?`;
           connection.query(query, answer.department, (error, results) => {
             if (error) throw error;
@@ -271,6 +280,7 @@ function init() {
             choices: choices
           },
           {
+            //confirming they do want to delete
             type: 'confirm',
             message: "Are you sure you want to delete this role?",
             name: 'confirm',
@@ -279,11 +289,13 @@ function init() {
         ]) .then(roleInfo => {
           if (roleInfo.confirm){
             const roleId = roleInfo.role;
+            //updating the database with deleted employee
             connection.query('UPDATE employee SET role_id = NULL WHERE role_id = ?', [roleId], (error, result) => {
               if (error) throw error;
               connection.query('DELETE FROM roles WHERE id = ?', [roleId], (error, result) => {
                 if (error) throw error;
                 console.log('Role deleted successfully!');
+                //returning user to menu
                 init();
               });
             });
@@ -328,6 +340,7 @@ function init() {
     }
     else if (answers.todo === 'Quit') {
       console.log("Goodby!");
+      //taking user out of the terminal
       process.exit(0);
     }
   });
